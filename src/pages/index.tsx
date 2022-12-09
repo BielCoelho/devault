@@ -1,7 +1,7 @@
 import { type NextPage } from "next";
 
-import { Login } from "./Login";
 import { Button, ButtonVariant } from "../components/Button";
+import { Login } from "./Login";
 
 const Home: NextPage = () => {
   // const hello = trpc.user.createUser;
@@ -15,4 +15,5 @@ const Home: NextPage = () => {
   );
 };
 
+Home.displayName = "HomePage";
 export default Home;

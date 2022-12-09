@@ -1,22 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
+import { useForm, Controller } from "react-hook-form";
 
-import { Button, ButtonVariant } from "../components/Button";
+import { Button } from "../components/Button";
+import { Input } from "../components/Input";
+import { useAuth } from "../contexts/AuthContex";
 
 export const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const { control, handleSubmit } = useForm({
+    defaultValues: {
+      email: "teste@teste.com",
+      password: "123456",
+    },
+  });
+  const { handleLogin } = useAuth();
 
-  const handleUsernameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
-  };
-
-  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // TODO: Validate username and password and perform login
+  const onSubmit = async (data: Record<string, unknown>) => {
+    const { email, password } = data;
+    await handleLogin(email as string, password as string);
   };
 
   return (
@@ -24,34 +24,53 @@ export const Login = () => {
       <p className="pointer-events-none text-5xl  font-extrabold tracking-tight">
         DEV<span className="text-orange-500">AULT</span>
       </p>
-      <form className="w-2/4" onSubmit={handleSubmit}>
-        <label className="mb-2 block font-bold text-orange-700">Username</label>
-        <input
-          className="block w-full rounded-lg bg-orange-200 p-2"
-          type="text"
-          placeholder="Enter your username"
-          value={username}
-          onChange={handleUsernameChange}
+      <form className="w-2/4" onSubmit={handleSubmit(onSubmit)}>
+        <label className="mb-2 block font-bold text-orange-700">E-Mail</label>
+        <Controller
+          name="email"
+          control={control}
+          defaultValue=""
+          render={({ field: { onChange, value } }) => {
+            return (
+              <Input
+                placeholder="Enter your Email"
+                value={value}
+                onChange={(e) => {
+                  onChange(e.target.value);
+                }}
+              />
+            );
+          }}
         />
         <label className="mb-2 mt-4 block font-bold text-orange-700">
           Password
         </label>
-        <input
-          className="block w-full rounded-lg bg-orange-200 p-2"
-          type="password"
-          placeholder="Enter your password"
-          value={password}
-          onChange={handlePasswordChange}
+        <Controller
+          name="password"
+          control={control}
+          defaultValue=""
+          render={({ field: { onChange, value } }) => {
+            return (
+              <Input
+                type="password"
+                placeholder="Enter your Password"
+                value={value}
+                onChange={(e) => {
+                  onChange(e.target.value);
+                }}
+              />
+            );
+          }}
         />
         <div className="mt-4">
-          <Button>Login</Button>
+          <Button type="submit">Login</Button>
         </div>
         <div className="flex gap-2">
           <div className="mt-4 w-full">
-            <Button variant={ButtonVariant.PRIMARY}>Registrar</Button>
+            <Button>Sign Up</Button>
           </div>
           <div className="mt-4 w-full">
-            <Button>Recuperar senha</Button>
+            <Button>Recover Password</Button>
           </div>
         </div>
       </form>

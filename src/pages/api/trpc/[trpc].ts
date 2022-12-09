@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 import { createNextApiHandler } from "@trpc/server/adapters/next";
 
 import { env } from "../../../env/server.mjs";
 import { createContext } from "../../../server/trpc/context";
-import { appRouter } from "../../../server/trpc/routes";
+import { appRouter } from "../../../server/trpc/routes/_app";
 
 // export API handler
 export default createNextApiHandler({

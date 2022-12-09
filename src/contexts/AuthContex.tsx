@@ -1,36 +1,47 @@
-import type { User } from "@prisma/client";
-import type { ReactNode } from "react";
-import { useCallback } from "react";
+import {
+  type ReactNode,
+  useState,
+  createContext,
+  useCallback,
+  useContext,
+} from "react";
 
-import { useContext } from "react";
-import { createContext, useState } from "react";
+import type { User } from "@prisma/client";
+
 import { trpc } from "../utils/trpc";
 
-interface AuthContextData {
+interface IAuthContextData {
   isAuthenticated: boolean;
   user?: Omit<User, "password">;
 
-  handleLogin: (email: string, password: string) => void;
+  handleLogin: (email: string, password: string) => Promise<void>;
   handleLogout: () => void;
 }
 
-export const AuthContext = createContext({} as AuthContextData);
+export const AuthContext = createContext({} as IAuthContextData);
 
-interface AuthProviderProps {
+interface IAuthProviderProps {
   children: ReactNode;
 }
 
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export const AuthProvider = ({ children }: IAuthProviderProps) => {
   const { mutateAsync: onLogin } = trpc.user.login.useMutation();
+
   const [user, setUser] = useState<Omit<User, "password">>();
   const isAuthenticated = !!user;
 
-  const handleLogin = useCallback(() => {
+  const handleLogin = useCallback(
     async (email: string, password: string) => {
-      const { user } = await onLogin({ email, password });
-      setUser(user);
-    };
-  }, [onLogin]);
+      try {
+        const { user } = await onLogin({ email, password });
+        setUser(user);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.log(error);
+      }
+    },
+    [onLogin]
+  );
 
   const handleLogout = useCallback(() => {
     setUser(undefined);
@@ -49,5 +60,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     </AuthContext.Provider>
   );
 };
+
+AuthProvider.displayName = "AuthProviderComponent";
 
 export const useAuth = () => useContext(AuthContext);

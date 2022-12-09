@@ -1,9 +1,9 @@
+import * as trpc from "@trpc/server";
+import { compare } from "bcryptjs";
 import { z } from "zod";
 
-import { compare } from "bcryptjs";
-
-import { router, publicProcedure } from "../trpc";
 import { generateUserToken } from "../../../utils/generateToken";
+import { router, publicProcedure } from "../trpc";
 
 export const userRouter = router({
   login: publicProcedure
@@ -19,13 +19,19 @@ export const userRouter = router({
       });
 
       if (!user) {
-        throw new Error("User not found");
+        throw new trpc.TRPCError({
+          code: "BAD_REQUEST",
+          message: "User not found",
+        });
       }
 
       const passwordValid = await compare(input.password, user.password);
 
       if (!passwordValid) {
-        throw new Error("Invalid password");
+        throw new trpc.TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid password",
+        });
       }
 
       const token = generateUserToken(user.id);
